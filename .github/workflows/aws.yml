@@ -58,7 +58,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # AWS認証
     - name: Configure AWS credentials
@@ -69,12 +69,13 @@ jobs:
         # GitHubのリポジトリ上でsecretsを設定してクレデンシャルを管理する
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/githubActionsExeRole
+        role-session-name: githubActsionsRoleSession
 
     # ECRにログイン
     - name: Login to Amazon ECR
       # outputsを参照するためのidを設定（？）
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
     # Dockerイメージをbuild & pushする
     - name: Build, tag, and push image to Amazon ECR
