@@ -44,17 +44,17 @@ on:
 #   CONTAINER_NAME: php-apache           # set this to the name of the container in the
 #                                                # containerDefinitions section of your task definition
 
+# permisssionを設定するとOIDCが使用可能となる
+permissions:
+  id-token: write
+  contents: read
+
 # 実行するジョブの定義
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
-
-    # permisssionを設定するとOIDCが使用可能となる
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
     - name: Checkout
@@ -64,12 +64,11 @@ jobs:
     - name: Configure AWS credentials
       # 以下「@」以降は「master」でないとエラーになる
       # 公式が「v1」と記載しているためエラー続発していた
-      uses: aws-actions/configure-aws-credentials@v3
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         # GitHubのリポジトリ上でsecretsを設定してクレデンシャルを管理する
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/githubActionsExeRole
-        role-session-name: samplerolesession
 
     # ECRにログイン
     - name: Login to Amazon ECR
