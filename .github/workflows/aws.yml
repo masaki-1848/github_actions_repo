@@ -64,7 +64,7 @@ jobs:
     - name: Configure AWS credentials
       # 以下「@」以降は「master」でないとエラーになる
       # 公式が「v1」と記載しているためエラー続発していた
-      uses: aws-actions/configure-aws-credentials@master
+      uses: aws-actions/configure-aws-credentials@v3
       with:
         # GitHubのリポジトリ上でsecretsを設定してクレデンシャルを管理する
         aws-region: ${{ secrets.AWS_REGION }}
