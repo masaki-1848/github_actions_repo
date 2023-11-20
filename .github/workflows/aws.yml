@@ -92,6 +92,8 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    # 以降の処理は不要
     # AWSのECSのタスク定義はdockerでいうところのdocker-compose.ymlに当たる
     # 取得するイメージや、コンテナ起動時の要件などを定義する
     # IAMのロールとして「AmazonECSTaskExecutionRolePolicy」が付与されていれば実行可能となる
@@ -109,20 +111,13 @@ jobs:
     #     container-name: ${{ env.CONTAINER_NAME }}
     #     image: ${{ steps.build-image.outputs.image }}
 
-    - name: Update service
-      env:
-        ECS_SERVICE: php-apache-deploy
-        ECS_CLUSTER: github-actions-cicd-cluster
-      run: 
-        aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment
-
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      env:
-        ECS_SERVICE: php-apache-deploy
-        ECS_CLUSTER: github-actions-cicd-cluster
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+    # - name: Deploy Amazon ECS task definition
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    #   env:
+    #     ECS_SERVICE: php-apache-deploy
+    #     ECS_CLUSTER: github-actions-cicd-cluster
+    #   with:
+    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+    #     service: ${{ env.ECS_SERVICE }}
+    #     cluster: ${{ env.ECS_CLUSTER }}
+    #     wait-for-service-stability: true
