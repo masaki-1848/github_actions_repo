@@ -110,6 +110,9 @@ jobs:
     #     image: ${{ steps.build-image.outputs.image }}
 
     - name: Update service
+      env:
+        ECS_SERVICE: php-apache-deploy
+        ECS_CLUSTER: github-actions-cicd-cluster
       run: 
         aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --force-new-deployment
 
