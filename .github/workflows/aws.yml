@@ -92,32 +92,30 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-    # 以降の処理は不要
     # AWSのECSのタスク定義はdockerでいうところのdocker-compose.ymlに当たる
     # 取得するイメージや、コンテナ起動時の要件などを定義する
     # IAMのロールとして「AmazonECSTaskExecutionRolePolicy」が付与されていれば実行可能となる
     # タスク定義の更新処理を行う
-    # - name: Fill in the new image ID in the Amazon ECS task definition
-    #   id: task-def
-    #   env:
-    #     # 任意のコンテナ名を定義する
-    #     CONTAINER_NAME: php-apache
-    #     # ECSのタスク定義ファイルは「application_root_path/aws/taskdef.json」ファイルを参照する
-    #     ECS_TASK_DEFINITION: ./aws/taskdef.json
-    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-    #   with:
-    #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
-    #     container-name: ${{ env.CONTAINER_NAME }}
-    #     image: ${{ steps.build-image.outputs.image }}
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      env:
+        # 任意のコンテナ名を定義する
+        CONTAINER_NAME: php-apache
+        # ECSのタスク定義ファイルは「application_root_path/aws/taskdef.json」ファイルを参照する
+        ECS_TASK_DEFINITION: ./aws/taskdef.json
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
 
-    # - name: Deploy Amazon ECS task definition
-    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-    #   env:
-    #     ECS_SERVICE: php-apache-deploy
-    #     ECS_CLUSTER: github-actions-cicd-cluster
-    #   with:
-    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-    #     service: ${{ env.ECS_SERVICE }}
-    #     cluster: ${{ env.ECS_CLUSTER }}
-    #     wait-for-service-stability: true
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      env:
+        ECS_SERVICE: php-apache-deploy
+        ECS_CLUSTER: github-actions-cicd-cluster
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
